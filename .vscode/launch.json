@@ -1,0 +1,25 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Docker Debug",
+            "type": "docker",
+            "request": "launch",
+
+            // This is the task configuren
+            "preLaunchTask": "odoo-debug",
+
+            // remoteRoot is given as 
+            // '/home/{odoo_user_name}/odoo' where odoo_user_name == odoo
+            // Update it if you are using some other username in your image
+            "python": {
+                "pathMappings": [
+                    {
+                        "localRoot": "${env:HOME}/odoo",
+                        "remoteRoot": "/home/odoo/odoo"
+                    }
+                ],
+            },
+        }
+    ]
+}

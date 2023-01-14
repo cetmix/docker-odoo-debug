@@ -1,0 +1,57 @@
+// Place your settings in this file to overwrite default and user settings.
+{
+    // **** Cetmix Docker Debug Variables ->
+
+    // Odoo version. Put your project version here
+    "odooVersion": "14.0",
+    
+    // Name of odoo user tat is used to run Odoo inside container
+    "containerOdooUserName": "odoo",
+
+    // Odoo root directory inside the container. This location is mounted to host file system
+    "containerOdooRoot" : "home/${config:containerOdooUserName}/odoo",
+    
+    // Odoo root directory on host. This directory will be mounted inside the container
+    "hostOdooRoot" : "${env:HOME}/odoo",
+    
+
+    // **** -> end of Cetmix Docker Debug Variables
+    
+
+    // use this so the autocompleate/goto definition will work with python extension
+    "python.autoComplete.extraPaths": [
+        "${env:HOME}/odoo/${config:odooVersion}/src/odoo",
+    ],
+    "python.analysis.extraPaths": [
+        "${env:HOME}/odoo/${config:odooVersion}/src/odoo",
+    ],
+    "python.linting.enabled": true,
+
+    //load the pylint_odoo
+    // CHeck here for details: https://github.com/OCA/pylint-odoo
+    "python.linting.pylintArgs": ["--load-plugins", "pylint_odoo"],
+    "python.formatting.provider": "black",
+
+    // add this auto-save option so the pylint will sow errors while editing otherwise
+    //it will only show the errors on file save
+    "files.autoSave": "afterDelay",
+    "files.autoSaveDelay": 500,
+
+    // The following will hide the compiled file in the editor/ add other file to hide them from editor
+    "files.exclude": {
+        "**/*.pyc": true
+    },
+    "python.linting.flake8Enabled": false,
+    "python.linting.pylintEnabled": true,
+    "git.ignoreLimitWarning": true,
+
+    // XML settings
+    "xml.format.preserveEmptyContent": true,
+    "xml.format.joinCDATALines": true,
+    "xml.format.joinContentLines": true,
+    "xmlTools.enableXmlTreeViewCursorSync": true,
+    "xmlTools.splitXmlnsOnFormat": false,
+
+    // Python type checking
+    "python.analysis.typeCheckingMode": "basic",
+}
