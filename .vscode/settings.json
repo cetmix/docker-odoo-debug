@@ -4,6 +4,8 @@
 
     // Odoo version. Put your project version here
     "odooVersion": "14.0",
+    // IMPORTANT: you need to update paths manually in lines 24 and 27 when changing version
+
     
     // Name of odoo user tat is used to run Odoo inside container
     "containerOdooUserName": "odoo",
@@ -14,16 +16,15 @@
     // Odoo root directory on host. This directory will be mounted inside the container
     "hostOdooRoot" : "${env:HOME}/odoo",
     
-
     // **** -> end of Cetmix Docker Debug Variables
     
 
     // use this so the autocompleate/goto definition will work with python extension
     "python.autoComplete.extraPaths": [
-        "${env:HOME}/odoo/${config:odooVersion}/src/odoo",
+        "${env:HOME}/odoo/14.0/src/odoo",  // Update this path when changing vesrion
     ],
     "python.analysis.extraPaths": [
-        "${env:HOME}/odoo/${config:odooVersion}/src/odoo",
+        "${env:HOME}/odoo/14.0/src/odoo",  // Update this path  when changing version
     ],
     "python.linting.enabled": true,
 

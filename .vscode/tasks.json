@@ -8,95 +8,107 @@
 // eg "odooVersion"
 // *****
 {
-    "version": "2.0.0",
-    "tasks": [
+  "version": "2.0.0",
+  "tasks": [
 
-      // ******************************************
-      // This configuration uses custom Dockerfile
-      // Scroll to the botton to see how
-      // to implement your own Dockerfile
-      // ******************************************
-      {
-        // This label will be used in launch.json
-        "label": "odoo-debug",
-        "type": "docker-run",
-        // Name of the task that is used to build image
-        // This task will be run before running current task
-        "dependsOn": ["build-image"],
-        "dockerRun": {
-          "containerName": "my-odoo-${config:odooVersion}",          
-          
-          // Image name musе be the same as image tag in the "docker-build" task
-          "image": "my-odoo:${config:odooVersion}",
+    // ******************************************
+    // This configuration uses custom Dockerfile
+    // Scroll to the botton to see how
+    // to implement your own Dockerfile
+    // ******************************************
+    {
+      // This label will be used in launch.json
+      "label": "odoo-debug",
+      "type": "docker-run",
+      // Name of the task that is used to build image
+      
+      // This task will be run before running current task
+      // Disable it to use pre-built image
+      "dependsOn": ["build-image"],
+      
+      "dockerRun": {
+        "containerName": "my-odoo-${config:odooVersion}",          
+        
+        // Image name musе be the same as image tag in the "docker-build" task
+        "image": "my-odoo:${config:odooVersion}",
 
-          // containerPath is given as 
-          // '/home/{odoo_user_name}/odoo' where odoo_user_name == odoo
-          // Update it if you are using some other username in your image
-          "volumes": [
-            {
-              "containerPath": "/home/odoo/odoo",
-              "localPath": "${env:HOME}/odoo"
-            }
-          ],
-          
-          // This ports will be expos
-          // If you want to run several Odoo instances at the same time
-          // don't forget to assing different hostPort values to each of them
-          "ports": [
-            {
-              "containerPort": 8069,
-              "hostPort": 8069
-            },{
-              "containerPort": 5678,
-              "hostPort": 5678
-            },
-            // Activae this port only in case you need to lanuch Odoo in multi worker mode
-            // {
-            //   "containerPort": 8072,
-            //   "hostPort": 8072
-            // },
-          ],
-          
-          // !!!!!!!!!!!!!!!!
-          // This links container to specified Postgres container
-          // It must be  in case you are not exposing port of your Postgres container
-          // Eg you would like to use dedicated DB server for this project
-          // "customOptions": "--link db-shared:db"
-          "customOptions": "--add-host='host.docker.internal:host-gateway'"
-        },
+        // containerPath is given as 
+        // '/home/{odoo_user_name}/odoo' where odoo_user_name == odoo
+        // Update it if you are using some other username in your image
+        "volumes": [
+          {
+            "containerPath": "/home/odoo/odoo",
+            "localPath": "${env:HOME}/odoo"
+          }
+        ],
+        
+        // This ports will be expos
+        // If you want to run several Odoo instances at the same time
+        // don't forget to assing different hostPort values to each of them
+        "ports": [
+          {
+            "containerPort": 8069,
+            "hostPort": 8069
+          },{
+            "containerPort": 5678,
+            "hostPort": 5678
+          },
+          // Activae this port only in case you need to lanuch Odoo in multi worker mode
+          // {
+          //   "containerPort": 8072,
+          //   "hostPort": 8072
+          // },
+        ],
+        
+        // !!!!!!!!!!!!!!!!
+        // This links container to specified Postgres container
+        // It must be enabled in case you are not exposing port of your Postgres container
+        // Eg you would like to use dedicated DB server for this project
+       
+        // "customOptions": "--link db-shared:db"
 
-        // Argumetns that will be passed to Odoo executable
-        // NB: all paths are given as "from inside the container"
-        // Which meeans that if you move your config somethere else
-        // you need to adjust the part of the path after 'home/odoo/odoo'
-        "python": {
-          "args": [
-            // Odoo config file location
-            "--config=${config:containerOdooRoot}/docker-odoo-debug/${config:odooVersion}/odoo-docker.conf",
-            // Uncomment the line below to Use selected DB only
-            // "--database=my_custom_db",
-            // Uncomment the line below to automatically update the moduel(s)
-            // "--update=my_custom_module",
-          ],
-          // Odoo binary executable
-          "file": "${config:containerOdooRoot}/${config:odooVersion}/src/odoo/odoo-bin"
-        },
+        // This option is needed to connect to the host port from withing the Docker container
+        // Enable it if Postgres port is exposed to host
+        "customOptions": "--add-host='host.docker.internal:host-gateway'"
       },
-      // ***************************************
-      // This task is used to build an image 
-      //  from  Dockerfile
-      // ***************************************
-      {
-        "label": "build-image",
-        "type": "docker-build",
-        "dockerBuild": {
-          // This pass is valid In case you cloned this repo to yout $HOME/odoo folder
-          // Dont't forget to 
-          "dockerfile": "${config:hostOdooRoot}/docker-odoo-debug/${config:odooVersion}/Dockerfile",
-          "context": "${config:hostOdooRoot}/docker-odoo-debug/${config:odooVersion}",
-          // NB: tag must be the same as "image" field value in 
-          "tag": "my-odoo:${config:odooVersion}"
-        }
+
+      // Argumetns that will be passed to Odoo executable
+      // NB: all paths are given as "from inside the container"
+      // Which meeans that if you move your config somethere else
+      // you need to adjust the part of the path after 'home/odoo/odoo'
+      "python": {
+        "args": [
+          // Odoo config file location
+          "--config=${config:containerOdooRoot}/${config:odooVersion}/conf/odoo-docker.conf",
+          // Uncomment the line below to Use selected DB only
+          // "--database=my_odoo_db",
+          // Uncomment the line below to automatically update the moduel(s)
+          // "--update=my_odoo_module",
+          // "--init=my_odoo_module",
+          // "--test-enable",
+          // "--stop-after-init",
+
+        ],
+        // Odoo binary executable
+        "file": "${config:containerOdooRoot}/${config:odooVersion}/src/odoo/odoo-bin"
+      },
+    },
+    // ***************************************
+    // This task is used to build an image 
+    //  from  Dockerfile
+    // It will ve triggered only if "dependsOn": ["build-image"] is enabled in the upper task
+    // ***************************************
+    {
+      "label": "build-image",
+      "type": "docker-build",
+      "dockerBuild": {
+        // This pass is valid In case you cloned this repo to yout $HOME/odoo folder
+        // Dont't forget to 
+        "dockerfile": "${config:hostOdooRoot}/docker-odoo-debug/${config:odooVersion}/Dockerfile",
+        "context": "${config:hostOdooRoot}/docker-odoo-debug/${config:odooVersion}",
+        // NB: tag must be the same as "image" field value in 
+        "tag": "my-odoo:${config:odooVersion}"
       }
-    ]
-  }
+    }
+  ]
+}
