@@ -1,6 +1,6 @@
 FROM python:3.7-bullseye
 ARG ODOO_VERSION=11.0
-ARG DOCKER_ODOO_UID=9999  
+ARG DOCKER_ODOO_UID=9999
 ARG DOCKER_ODOO_GID=9999
 
 SHELL ["/bin/bash", "-xo", "pipefail", "-c"]

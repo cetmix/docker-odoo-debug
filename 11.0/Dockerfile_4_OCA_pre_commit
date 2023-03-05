@@ -1,0 +1,38 @@
+# This Dockerfile is used to run OCA pre-commit inside the container
+#
+# Use the following command to build this image:
+# docker build -t oca-pre-commit:11.0 -f $HOME/odoo/docker-odoo-debug/11.0/Dockerfile_4_OCA_pre_commit $HOME/odoo/docker-odoo-debug/11.0
+#
+# After that use the following command to create and run new container
+# docker run -dt -v $HOME/odoo:/mnt/odoo --name pre-commit-11.0 oca-pre-commit:11.0
+# 
+# This will start the container and leave it running so you can attach to it later.
+# You can stop it if you don't need it any longer.
+#
+# To run pre commit login into container
+# e.g. docker exec -it --user=root pre-commit-11.0 bash
+# and run pre-commit
+# eg  cd /mnt/odoo/11.0/extra-addons/my-project && pre-commit run -a
+#
+# P.S. Ensure that docker user has write access on the host file system
+#
+# P.P.S Important! In MacOS and Windows (possibly) you can get the following warning:
+# [W8201(incoherent-interpreter-exec-perm), ] You have a python file with execution permissions 
+# but you don't have an interpreter magic comment, or a magic comment but no execution permission. 
+# If you really needs a execution permission then add a magic comment....
+#
+# This is due to how docker is mapping host FS. Just ignore it))
+# Or ping me if you have any better solution))
+
+
+FROM python:3.6-slim-bullseye
+
+# Install git
+RUN apt-get update && apt-get -y install git
+
+# Create a new directory to mount odoo
+RUN mkdir /mnt/odoo
+
+# Install debugger
+RUN python3.6 -m pip install --upgrade pip && \
+    python3.6 -m pip install pre-commit
