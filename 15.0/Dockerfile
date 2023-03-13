@@ -15,7 +15,12 @@ ENV LANG C.UTF-8
 RUN apt-get update && apt-get -y install python3-dev libxml2-dev libxslt1-dev libldap2-dev libsasl2-dev \
     libtiff5-dev libjpeg62-turbo-dev curl libopenjp2-7-dev zlib1g-dev libfreetype6-dev \
     liblcms2-dev libwebp-dev libharfbuzz-dev libfribidi-dev libxcb1-dev libpq-dev wkhtmltopdf \
-    python3-virtualenv virtualenv postgresql-client
+    python3-virtualenv virtualenv
+    
+# Install latest version of the PG client
+RUN sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt bullseye-pgdg main" > /etc/apt/sources.list.d/pgdg.list' \
+    && wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
+    && apt update && apt install -y postgresql-client
 
 # This is needed for RtL languages only
 # Comment this code in case you don't need this feature

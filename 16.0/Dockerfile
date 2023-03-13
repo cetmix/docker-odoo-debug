@@ -13,7 +13,13 @@ ENV LANG C.UTF-8
 # We also install  virtualenv package which will be created lated to create virtual environment
 
 RUN apt-get update && apt-get install -y python3-pip libldap2-dev libpq-dev libsasl2-dev \
-    python3-virtualenv virtualenv postgresql-client wkhtmltopdf
+    python3-virtualenv virtualenv wkhtmltopdf
+
+
+# Install latest version of the PG client
+RUN sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt bullseye-pgdg main" > /etc/apt/sources.list.d/pgdg.list' \
+    && wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
+    && apt update && apt install -y postgresql-client
 
 # This is needed for RtL languages only
 # Comment this code in case you don't need this feature
