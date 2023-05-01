@@ -36,12 +36,12 @@ RUN python3.7 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 # Install debugger
-RUN python3.7 -m pip install --upgrade pip && \
-    python3.7 -m pip install debugpy pre-commit
+RUN python3.7 -m pip install "setuptools<58.0.0"
+RUN python3.7 -m pip install debugpy pre-commit
 
 # Install Odoo python dependencies
 RUN curl https://raw.githubusercontent.com/odoo/odoo/${ODOO_VERSION}/requirements.txt > /tmp/requirements.txt && \
-    pip3 install -r /tmp/requirements.txt
+    python3.7 -m pip install -r /tmp/requirements.txt
 
 
 # Add "odoo" user. We use same guid uid as in the official Odoo image
