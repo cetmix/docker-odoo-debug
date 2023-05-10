@@ -33,8 +33,8 @@ RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 # Install debugger
-RUN python3 -m pip install --upgrade pip && \
-    python3 -m pip install debugpy pre-commit setuptools wheel
+RUN python3.7 -m pip install "setuptools<58.0.0"
+RUN python3.7 -m pip install debugpy pre-commit wheel
 
 # Install Odoo python dependencies
 RUN curl https://raw.githubusercontent.com/odoo/odoo/${ODOO_VERSION}/requirements.txt > /tmp/requirements.txt && \
