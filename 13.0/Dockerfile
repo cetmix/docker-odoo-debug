@@ -17,7 +17,7 @@ RUN apt-get update && apt-get -y install node-less npm libxml2-dev libxslt1-dev 
     zlib1g-dev libfreetype6-dev liblcms2-dev libwebp-dev\  
     libharfbuzz-dev libfribidi-dev libxcb1-dev libpq-dev\  
     xvfb libfontconfig wkhtmltopdf \
-    python3-virtualenv virtualenv
+    python3-virtualenv virtualenv chromium
 
 # Install latest version of the PG client
 RUN sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt bullseye-pgdg main" > /etc/apt/sources.list.d/pgdg.list' \

@@ -13,8 +13,7 @@ ENV LANG C.UTF-8
 # We also install  virtualenv package which will be created lated to create virtual environment
 
 RUN apt-get update && apt-get install -y python3-pip libldap2-dev libpq-dev libsasl2-dev \
-    python3-virtualenv virtualenv wkhtmltopdf
-
+    python3-virtualenv virtualenv wkhtmltopdf chromium
 
 # Install latest version of the PG client
 RUN sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt bullseye-pgdg main" > /etc/apt/sources.list.d/pgdg.list' \
@@ -26,14 +25,16 @@ RUN sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt bullseye-pgdg main"
 RUN apt-get -y install node-less npm
 RUN npm install -g rtlcss
 
+
 # Enable VENV
 ENV VIRTUAL_ENV=/home/odoo/venv
 RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 # Install debugger
+# Websocket client is required for TOTP tests
 RUN python3 -m pip install --upgrade pip && \
-    python3 -m pip install debugpy pre-commit setuptools wheel
+    python3 -m pip install debugpy pre-commit setuptools wheel websocket-client
 
 # Install Odoo python dependencies
 RUN curl https://raw.githubusercontent.com/odoo/odoo/${ODOO_VERSION}/requirements.txt > /tmp/requirements.txt && \
