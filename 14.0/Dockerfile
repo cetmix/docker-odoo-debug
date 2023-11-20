@@ -1,4 +1,4 @@
-FROM python:3.7-bullseye
+FROM python:3.10-bullseye
 ARG ODOO_VERSION=14.0
 ARG DOCKER_ODOO_UID=9999  
 ARG DOCKER_ODOO_GID=9999
@@ -32,12 +32,12 @@ RUN npm install -g rtlcss
 
 # Enable VENV
 ENV VIRTUAL_ENV=/home/odoo/venv
-RUN python3.7 -m venv $VIRTUAL_ENV
+RUN python3.10 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 # Install debugger
-RUN python3.7 -m pip install "setuptools<58.0.0"
-RUN python3.7 -m pip install debugpy pre-commit
+RUN python3.10 -m pip install setuptools wheel
+RUN python3.10 -m pip install debugpy pre-commit
 
 # Install Odoo python dependencies
 RUN curl https://raw.githubusercontent.com/odoo/odoo/${ODOO_VERSION}/requirements.txt > /tmp/requirements.txt && \
