@@ -1,8 +1,10 @@
-FROM python:3.10-bullseye
+FROM python:3.10-slim-bullseye
 ARG ODOO_VERSION=14.0
 ARG DOCKER_ODOO_UID=9999  
 ARG DOCKER_ODOO_GID=9999
-
+ENV PIP_NO_CACHE_DIR=1
+ARG POSTGRES_VERSION=14
+ARG TARGETARCH
 SHELL ["/bin/bash", "-xo", "pipefail", "-c"]
 
 # Generate locale C.UTF-8 for postgres and general locale data
@@ -12,22 +14,40 @@ ENV LANG C.UTF-8
 # https://www.odoo.com/documentation/14.0/administration/install/install.html#setup-install-source-linux-git
 # We also install  virtualenv package which will be created lated to create virtual environment
 
-RUN apt-get update && apt-get -y install node-less npm libxml2-dev libxslt1-dev libldap2-dev\  
-    libsasl2-dev libtiff5-dev libjpeg62-turbo-dev libopenjp2-7-dev\  
-    zlib1g-dev libfreetype6-dev liblcms2-dev libwebp-dev\  
-    libharfbuzz-dev libfribidi-dev libxcb1-dev libpq-dev\  
-    xvfb libfontconfig wkhtmltopdf \
-    python3-virtualenv virtualenv chromium
+RUN apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -qq --no-install-recommends curl python3-pip libldap2-dev libpq-dev libsasl2-dev \
+    python3-dev python3-virtualenv build-essential gnupg npm git \
+    # OCA extra deps 
+    # for lxml
+    libxml2-dev \
+    libxslt1-dev \
+    libz-dev \
+    libxmlsec1-dev \
+    # for pycups
+    libcups2-dev \
+    # some other build tools
+    swig \
+    libffi-dev \
+    pkg-config \
+    # For running tours
+    chromium
+
+# Install wkhtmltopdf
+RUN if [ -z "${TARGETARCH}" ]; then \
+    TARGETARCH="$(dpkg --print-architecture)"; \
+    fi; \
+    curl -sSL https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6.1-3/wkhtmltox_0.12.6.1-3.bullseye_${TARGETARCH}.deb -o /tmp/wkhtml.deb \
+    && apt-get update -qq \
+    && dpkg --force-depends -i /tmp/wkhtml.deb \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -qq -f --no-install-recommends \
+    && rm /tmp/wkhtml.deb
 
 # Install latest version of the PG client
-RUN sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt bullseye-pgdg main" > /etc/apt/sources.list.d/pgdg.list' \
-    && wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
-    && apt update && apt install -y postgresql-client
+RUN curl -sSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
+    && echo "deb http://apt.postgresql.org/pub/repos/apt/ bullseye-pgdg main" > /etc/apt/sources.list.d/pgclient.list \
+    && apt-get update -qq \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -qq postgresql-client-${POSTGRES_VERSION}
 
-
-# This is needed for RtL languages only
-# Comment this code in case you don't need this feature
-RUN apt-get -y install node-less npm
+# Install nodejs dependencies
 RUN npm install -g rtlcss
 
 # Enable VENV
@@ -36,12 +56,11 @@ RUN python3.10 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 # Install debugger
-RUN python3.10 -m pip install setuptools wheel
-RUN python3.10 -m pip install debugpy pre-commit
+RUN pip install setuptools wheel debugpy pre-commit
 
 # Install Odoo python dependencies
 RUN curl https://raw.githubusercontent.com/odoo/odoo/${ODOO_VERSION}/requirements.txt > /tmp/requirements.txt && \
-    pip3 install -r /tmp/requirements.txt
+    pip install -r /tmp/requirements.txt
 
 
 # Add "odoo" user. We use same guid uid as in the official Odoo image
@@ -49,7 +68,7 @@ RUN groupadd --gid ${DOCKER_ODOO_GID} odoo && useradd odoo -u ${DOCKER_ODOO_UID}
 
 # Set permissions
 RUN mkdir -p /home/odoo/odoo \
-    && chown -R odoo /home/odoo
+    && chown odoo /home/odoo
 
 # Expose Odoo services
 EXPOSE 5678 8069 8071 8072
