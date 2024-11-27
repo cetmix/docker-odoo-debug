@@ -1,9 +1,9 @@
-FROM python:3.11-slim-bookworm
-ARG ODOO_VERSION=16.0
+FROM python:3.12-slim-bookworm
+ARG ODOO_VERSION=18.0
 ARG DOCKER_ODOO_UID=9999  
 ARG DOCKER_ODOO_GID=9999
 ENV PIP_NO_CACHE_DIR=1
-ARG POSTGRES_VERSION=15
+ARG POSTGRES_VERSION=16
 ARG TARGETARCH
 SHELL ["/bin/bash", "-xo", "pipefail", "-c"]
 
@@ -52,7 +52,7 @@ RUN npm install -g rtlcss
 
 # Enable VENV
 ENV VIRTUAL_ENV=/home/odoo/venv
-RUN python -m venv $VIRTUAL_ENV
+RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 # Install debugger

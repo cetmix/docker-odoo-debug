@@ -8,7 +8,7 @@ ARG TARGETARCH
 SHELL ["/bin/bash", "-xo", "pipefail", "-c"]
 
 # Generate locale C.UTF-8 for postgres and general locale data
-ENV LANG C.UTF-8
+ENV LANG=C.UTF-8
 
 # Install dependencies as describe in Odoo documentation
 # https://www.odoo.com/documentation/14.0/administration/install/install.html#setup-install-source-linux-git
@@ -55,12 +55,15 @@ ENV VIRTUAL_ENV=/home/odoo/venv
 RUN python3.10 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
+# Upgrade pip
+RUN pip install --upgrade pip
+
 # Install debugger
 RUN pip install setuptools wheel debugpy pre-commit
 
 # Install Odoo python dependencies
-RUN curl https://raw.githubusercontent.com/odoo/odoo/${ODOO_VERSION}/requirements.txt > /tmp/requirements.txt && \
-    pip install -r /tmp/requirements.txt
+COPY requirements.txt /tmp/requirements.txt
+RUN  pip install -r /tmp/requirements.txt
 
 
 # Add "odoo" user. We use same guid uid as in the official Odoo image
