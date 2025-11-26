@@ -56,7 +56,7 @@ RUN python -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 # Install debugger
-RUN pip install setuptools wheel debugpy pre-commit
+RUN pip install setuptools wheel debugpy pre-commit packaging
 
 # Install Odoo python dependencies
 RUN curl https://raw.githubusercontent.com/odoo/odoo/${ODOO_VERSION}/requirements.txt > /tmp/requirements.txt && \
