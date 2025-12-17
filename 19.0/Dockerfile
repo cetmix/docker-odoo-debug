@@ -1,5 +1,5 @@
 FROM python:3.12-slim-bookworm
-ARG ODOO_VERSION=18.0
+ARG ODOO_VERSION=19.0
 ARG DOCKER_ODOO_UID=9999  
 ARG DOCKER_ODOO_GID=9999
 ENV PIP_NO_CACHE_DIR=1
@@ -8,7 +8,7 @@ ARG TARGETARCH
 SHELL ["/bin/bash", "-xo", "pipefail", "-c"]
 
 # Generate locale C.UTF-8 for postgres and general locale data
-ENV LANG=C.UTF-8
+ENV LANG C.UTF-8
 
 # Install dependencies as describe in Odoo documentation
 # https://www.odoo.com/documentation/14.0/administration/install/install.html#setup-install-source-linux-git
@@ -56,8 +56,7 @@ RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 # Install debugger
-RUN pip install setuptools wheel debugpy pre-commit websocket-client packaging
-
+RUN pip install setuptools wheel debugpy pre-commit packaging
 
 # Install Odoo python dependencies
 RUN curl https://raw.githubusercontent.com/odoo/odoo/${ODOO_VERSION}/requirements.txt > /tmp/requirements.txt && \
