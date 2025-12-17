@@ -55,4 +55,18 @@
 
     // Python type checking
     "python.analysis.typeCheckingMode": "basic",
+
+    "pylint.args": ["--rcfile=../.pylintrc", "--exit-zero"],
+    "[python]": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "charliermarsh.ruff",
+        "editor.codeActionsOnSave": {
+            "source.fixAll.ruff": "explicit",
+            "source.organizeImports.ruff": "explicit",
+        }
+    },
+    "[xml]": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+    },
 }
