@@ -8,7 +8,7 @@ ARG TARGETARCH
 SHELL ["/bin/bash", "-xo", "pipefail", "-c"]
 
 # Generate locale C.UTF-8 for postgres and general locale data
-ENV LANG C.UTF-8
+ENV LANG=C.UTF-8
 
 # Install dependencies as describe in Odoo documentation
 # https://www.odoo.com/documentation/14.0/administration/install/install.html#setup-install-source-linux-git
