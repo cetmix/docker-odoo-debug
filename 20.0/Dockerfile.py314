@@ -1,4 +1,4 @@
-FROM python:3.12-slim-bookworm
+FROM python:3.14-slim-bookworm
 ARG ODOO_VERSION=20.0
 ARG DOCKER_ODOO_UID=9999
 ARG DOCKER_ODOO_GID=9999
@@ -59,12 +59,19 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 RUN pip install "setuptools<82" wheel debugpy pre-commit packaging
 
 # Install Odoo python dependencies
+# NOTE (py314 experiment only, not in the stock 3.12 Dockerfile): libsass==0.22.0's
+# setup.py fails to build on Python 3.14 with
+#   AttributeError: 'Constant' object has no attribute 's'
+# (its own version-detection code walks an ast.Constant node expecting the
+# pre-3.8-deprecated .s attribute; Python 3.14 no longer provides it). No
+# manylinux/linux-arm64 wheel exists for libsass 0.22.0 or the latest 0.23.0
+# either, so this is not a missing-wheel problem, and pinning to 0.23.0
+# doesn't sidestep it (same setup.py pattern). Deliberately dropped here so
+# the rest of stock Odoo 20.0's requirements can be evaluated on 3.14;
+# SCSS/asset (re)compilation is out of scope for this profiling workload.
 RUN curl https://raw.githubusercontent.com/odoo/odoo/${ODOO_VERSION}/requirements.txt > /tmp/requirements.txt && \
+    sed -i '/^libsass/d' /tmp/requirements.txt && \
     pip install -r /tmp/requirements.txt
-
-# Odoo browser tests (HttpCase.browser_js, tours, hoot) need it and are skipped silently without it
-# ("websocket-client module is not installed", odoo/tests/common.py). Not in Odoo's requirements.txt.
-RUN pip install websocket-client
 
 
 # Add "odoo" user. We use same guid uid as in the official Odoo image
